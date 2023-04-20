@@ -40,10 +40,14 @@ export default function handler(
       }
     );
 
+    res.setHeader(
+      'Set-Cookie',
+      `refreshToken=${refreshToken}; secure; httpOnly`
+    );
+
     return res.status(200).json({
       user: payload,
       accessToken,
-      refreshToken,
     });
   } catch (error: any) {
     return res.status(500).json(error);

@@ -8,11 +8,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   user: Omit<User, 'password'>;
   accessToken: string;
-  refreshToken: string;
-}
-
-export interface RefreshTokenRequest {
-  refreshToken: string;
 }
 
 export interface RefreshTokenResponse {
