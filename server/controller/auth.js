@@ -60,4 +60,12 @@ const refreshToken = (req, res) => {
   }
 };
 
-module.exports = { login, refreshToken };
+const logout = (req, res) => {
+  try {
+    res.status(200).json('Success');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { login, refreshToken, logout };
