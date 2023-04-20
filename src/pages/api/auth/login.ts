@@ -1,27 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 
-import { User } from '@/types/user';
+import { LoginResponse } from '@/types/api/auth';
 import users from '@/data/user';
 
-type Response =
-  | {
-      user: Omit<User, 'password'>;
-      accessToken: string;
-      refreshToken: string;
-    }
-  | string;
-
-export default function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
-  const { email, password } = req.body;
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<LoginResponse | string>
+) {
+  const { email, password } = JSON.parse(req.body);
   const [user] = users.filter((user) => user.email === email);
 
   if (!user) {
-    res.status(401).json('Bad email');
+    return res.status(401).json('Bad email');
   }
 
   if (user.password !== password) {
-    res.status(401).json('Bad password');
+    return res.status(401).json('Bad password');
   }
 
   try {
@@ -36,17 +31,21 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Respon
       issuer: 'Auth Pattern Server',
     });
 
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET_KEY, {
-      expiresIn: '24h',
-      issuer: 'Auth Pattern Server',
-    });
+    const refreshToken = jwt.sign(
+      payload,
+      process.env.REFRESH_TOKEN_SECRET_KEY,
+      {
+        expiresIn: '24h',
+        issuer: 'Auth Pattern Server',
+      }
+    );
 
-    res.status(200).json({
+    return res.status(200).json({
       user: payload,
       accessToken,
       refreshToken,
     });
   } catch (error: any) {
-    res.status(500).json(error);
+    return res.status(500).json(error);
   }
 }
