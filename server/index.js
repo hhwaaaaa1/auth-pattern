@@ -2,6 +2,7 @@ const express = require('express');
 const dontenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const authController = require('./controller/auth');
 
 const app = express();
 dontenv.config();
@@ -15,6 +16,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.post('/login', authController.login);
 
 app.listen(process.env.PORT, () => {
   console.log(`server is on ${process.env.PORT}`);
