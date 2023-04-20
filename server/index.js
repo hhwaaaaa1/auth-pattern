@@ -18,6 +18,7 @@ app.use(
 );
 
 app.post('/login', authController.login);
+app.post('/refresh-token', authController.refreshToken);
 
 app.listen(process.env.PORT, () => {
   console.log(`server is on ${process.env.PORT}`);

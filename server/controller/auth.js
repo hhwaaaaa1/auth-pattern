@@ -42,4 +42,22 @@ const login = (req, res) => {
   next();
 };
 
-module.exports = { login };
+const refreshToken = (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY);
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET_KEY, {
+      expiresIn: '1m',
+      issuer: 'Auth Pattern Server',
+    });
+
+    res.status(200).json({
+      user: payload,
+      accessToken,
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { login, refreshToken };
