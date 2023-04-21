@@ -1,25 +1,34 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-import users from '@/data/user';
 import activeUsers from '@/data/activeUser';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<string>
+  res: NextApiResponse
 ) {
-  const { email, password } = JSON.parse(req.body);
-  const [user] = users.filter((user) => user.email === email);
-
-  if (!user) {
-    return res.status(401).json('Bad email');
-  }
-
-  if (user.password !== password) {
-    return res.status(401).json('Bad password');
-  }
-
   try {
+    const refreshTokenCookie = cookies().get('refreshToken');
+
+    if (!refreshTokenCookie) {
+      return res.status(401).json('No refresh token cookie');
+    }
+
+    const { id } = jwt.verify(
+      refreshTokenCookie.value,
+      process.env.REFRESH_TOKEN_SECRET_KEY
+    ) as JwtPayload;
+
+    const activeUserIndex = activeUsers.findIndex(
+      (user) => user.id === id
+    );
+    const user = activeUsers[activeUserIndex];
+
+    if (!user || user.refreshToken !== refreshTokenCookie.value) {
+      return res.status(401).json('Inactive user');
+    }
+
     const payload = {
       id: user.id,
       username: user.username,
@@ -44,10 +53,10 @@ export default function handler(
       }
     );
 
-    activeUsers.push({
+    activeUsers[activeUserIndex] = {
       ...user,
       refreshToken,
-    });
+    };
 
     res.setHeader(
       'Set-Cookie',
@@ -57,7 +66,7 @@ export default function handler(
     );
 
     return res.status(200).json(accessToken);
-  } catch (error: any) {
+  } catch (error) {
     return res.status(500).json(error);
   }
 }
