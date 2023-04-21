@@ -17,7 +17,7 @@ export function useAuthRequest() {
   const refreshToken = async () => {
     const response = await get<GetTokenResponse>('/api/auth/token');
     if (response.success) {
-      setAuthState({ token: response.token });
+      setAuthState((state) => ({ ...state, token: response.token }));
       activeToken.current = response.token;
     }
   };
