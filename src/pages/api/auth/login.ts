@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { LoginResponse } from '@/types/api/auth';
 import users from '@/data/user';
+import activeUsers from '@/data/activeUser';
 
 export default function handler(
   req: NextApiRequest,
@@ -26,10 +27,14 @@ export default function handler(
       email: user.email,
     };
 
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET_KEY, {
-      expiresIn: '1m',
-      issuer: 'Auth Pattern Server',
-    });
+    const accessToken = jwt.sign(
+      payload,
+      process.env.ACCESS_TOKEN_SECRET_KEY,
+      {
+        expiresIn: '1m',
+        issuer: 'Auth Pattern Server',
+      }
+    );
 
     const refreshToken = jwt.sign(
       payload,
@@ -40,14 +45,20 @@ export default function handler(
       }
     );
 
+    activeUsers.push({
+      id: user.id,
+      refreshToken,
+    });
+
     res.setHeader(
       'Set-Cookie',
-      `refreshToken=${refreshToken}; secure; httpOnly`
+      `refreshToken=${refreshToken}; Max-Age=${
+        24 * 60 * 60
+      }; secure; httpOnly`
     );
 
     return res.status(200).json({
-      user: payload,
-      accessToken,
+      token: accessToken,
     });
   } catch (error: any) {
     return res.status(500).json(error);

@@ -6,8 +6,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  user: Omit<User, 'password'>;
-  accessToken: string;
+  token: string;
 }
 
 export interface RefreshTokenResponse {
