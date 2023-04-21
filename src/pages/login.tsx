@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import { LoginRequest, LoginResponse } from '@/types/api/auth';
+import { LoginRequest } from '@/types/api/auth';
 import { userState } from '@/states/userState';
 import { post } from '@/utils/request';
 
@@ -29,14 +29,14 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
-      const response = await post<LoginResponse, LoginRequest>(
+      const token = await post<string, LoginRequest>(
         '/api/auth/login',
         {
           email,
           password,
         }
       );
-      setUserState({ ...response.user, token: response.accessToken });
+      setUserState({ token });
       router.push('/');
     } catch (error) {
       console.error(error);
@@ -62,7 +62,11 @@ export default function Login() {
         type="password"
         onChange={handleChangePassword}
       />
-      <Button type="button" variant="contained" onClick={handleSubmit}>
+      <Button
+        type="button"
+        variant="contained"
+        onClick={handleSubmit}
+      >
         SUBMIT
       </Button>
     </Stack>
