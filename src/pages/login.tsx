@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSetRecoilState } from 'recoil';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import { LoginRequest } from '@/types/api/auth';
-import { userState } from '@/states/userState';
-import { post } from '@/utils/request';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const setUserState = useSetRecoilState(userState);
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleChangeEmail = ({
@@ -29,14 +26,7 @@ export default function Login() {
 
   const handleSubmit = async () => {
     try {
-      const token = await post<string, LoginRequest>(
-        '/api/auth/login',
-        {
-          email,
-          password,
-        }
-      );
-      setUserState({ token });
+      await login(email, password);
       router.push('/');
     } catch (error) {
       console.error(error);

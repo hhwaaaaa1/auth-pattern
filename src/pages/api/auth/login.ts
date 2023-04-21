@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
+import { SignJWT } from 'jose';
 
+import { LoginResponse } from '@/types/api/auth';
 import users from '@/data/user';
-import activeUsers from '@/data/activeUser';
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<string>
+  res: NextApiResponse<LoginResponse | string>
 ) {
   const { email, password } = JSON.parse(req.body);
   const [user] = users.filter((user) => user.email === email);
@@ -26,28 +26,19 @@ export default function handler(
       email: user.email,
     };
 
-    const accessToken = jwt.sign(
-      payload,
-      process.env.ACCESS_TOKEN_SECRET_KEY,
-      {
-        expiresIn: '1m',
-        issuer: 'Auth Pattern Server',
-      }
-    );
+    const accessToken = await new SignJWT(payload)
+      .setProtectedHeader({ typ: 'JWT', alg: 'HS256' })
+      .setExpirationTime('3s')
+      .sign(
+        new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET_KEY)
+      );
 
-    const refreshToken = jwt.sign(
-      payload,
-      process.env.REFRESH_TOKEN_SECRET_KEY,
-      {
-        expiresIn: '24h',
-        issuer: 'Auth Pattern Server',
-      }
-    );
-
-    activeUsers.push({
-      ...user,
-      refreshToken,
-    });
+    const refreshToken = await new SignJWT(payload)
+      .setProtectedHeader({ typ: 'JWT', alg: 'HS256' })
+      .setExpirationTime('24h')
+      .sign(
+        new TextEncoder().encode(process.env.REFRESH_TOKEN_SECRET_KEY)
+      );
 
     res.setHeader(
       'Set-Cookie',
@@ -56,7 +47,10 @@ export default function handler(
       }; secure; httpOnly`
     );
 
-    return res.status(200).json(accessToken);
+    return res.status(200).json({
+      user: payload,
+      token: accessToken,
+    });
   } catch (error: any) {
     return res.status(500).json(error);
   }
