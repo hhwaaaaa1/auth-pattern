@@ -4,7 +4,7 @@ import { LoginRequest, LoginResponse } from '@/types/api/auth';
 import { authState } from '@/states/authState';
 import { get, post } from '@/utils/request';
 
-export function useAuth() {
+export function useAuthAPI() {
   const setAuthState = useSetRecoilState(authState);
 
   const login = async (email: string, password: string) => {

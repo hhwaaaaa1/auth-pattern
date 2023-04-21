@@ -2,12 +2,12 @@ import { useRecoilValue } from 'recoil';
 import { Button } from '@mui/material';
 
 import { authState } from '@/states/authState';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthAPI } from '@/hooks/useAuthAPI';
 import { useRouter } from 'next/router';
 
 export default function Home() {
   const { user } = useRecoilValue(authState);
-  const { logout } = useAuth();
+  const { logout } = useAuthAPI();
   const router = useRouter();
 
   const handleLogout = async () => {
