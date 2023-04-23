@@ -22,17 +22,23 @@ export function useAuthRequest() {
     }
   };
 
+  const verifyToken = async () => {
+    if (!activeToken.current) throw Error;
+
+    await jwtVerify(
+      activeToken.current,
+      new TextEncoder().encode(
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET_KEY
+      )
+    );
+  };
+
   const authGet = async <T>(url: string) => {
     if (!activeToken.current) {
       await refreshToken();
     } else {
       try {
-        await jwtVerify(
-          activeToken.current,
-          new TextEncoder().encode(
-            process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET_KEY
-          )
-        );
+        await verifyToken();
       } catch (error) {
         await refreshToken();
       }
