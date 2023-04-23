@@ -21,7 +21,7 @@ export default function UserRoot({ children }: UserRootProps) {
         setAuthState((state) => ({
           ...state,
           user,
-          isInitialized: true,
+          isUserInitialized: true,
         }));
       },
     }

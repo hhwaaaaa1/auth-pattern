@@ -13,14 +13,14 @@ export function withAuth<P extends Record<string, unknown>>(
       return null;
     }
 
-    const { user, isInitialized } = useRecoilValue(authState);
+    const { user, isUserInitialized } = useRecoilValue(authState);
     const router = useRouter();
 
     useEffect(() => {
-      if (isInitialized && !user) {
+      if (isUserInitialized && !user) {
         router.replace('/login');
       }
-    }, [isInitialized, router]);
+    }, [isUserInitialized, router]);
 
     if (!user) {
       return null;

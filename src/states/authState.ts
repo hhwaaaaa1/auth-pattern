@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { User } from '@/models/user';
 
 interface AuthState {
-  isInitialized: boolean;
+  isUserInitialized: boolean;
   user?: Omit<User, 'password'>;
   token?: string;
 }
@@ -12,6 +12,6 @@ interface AuthState {
 export const authState = atom<AuthState>({
   key: `authState/${v4()}`,
   default: {
-    isInitialized: false,
+    isUserInitialized: false,
   },
 });
