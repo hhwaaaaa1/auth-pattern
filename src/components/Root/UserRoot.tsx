@@ -18,7 +18,11 @@ export default function UserRoot({ children }: UserRootProps) {
     () => authGet<GetUserResponse>('/api/auth/user'),
     {
       onSuccess: (user) => {
-        setAuthState((state) => ({ ...state, user }));
+        setAuthState((state) => ({
+          ...state,
+          user,
+          isInitialized: true,
+        }));
       },
     }
   );

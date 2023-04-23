@@ -37,7 +37,7 @@ export default async function handler(
 
     const accessToken = await new SignJWT(payload)
       .setProtectedHeader({ typ: 'JWT', alg: 'HS256' })
-      .setExpirationTime('3s')
+      .setExpirationTime('1m')
       .sign(
         new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET_KEY)
       );

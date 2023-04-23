@@ -1,11 +1,12 @@
 import { useRecoilValue } from 'recoil';
+import { useRouter } from 'next/router';
 import { Button } from '@mui/material';
 
 import { authState } from '@/states/authState';
+import { withAuth } from '@/hoc/withAuth';
 import { useAuthAPI } from '@/hooks/useAuthAPI';
-import { useRouter } from 'next/router';
 
-export default function Home() {
+export default withAuth(function My() {
   const { user } = useRecoilValue(authState);
   const { logout } = useAuthAPI();
   const router = useRouter();
@@ -23,4 +24,4 @@ export default function Home() {
       </Button>
     </div>
   );
-}
+});

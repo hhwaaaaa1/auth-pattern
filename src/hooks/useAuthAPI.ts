@@ -12,12 +12,12 @@ export function useAuthAPI() {
       '/api/auth/login',
       { email, password }
     );
-    setAuthState({ user, token });
+    setAuthState({ user, token, isInitialized: true });
   };
 
   const logout = async () => {
     await get('/api/auth/logout');
-    setAuthState({});
+    setAuthState({ isInitialized: true });
   };
 
   return { login, logout };
